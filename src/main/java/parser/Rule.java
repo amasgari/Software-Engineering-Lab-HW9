@@ -47,15 +47,42 @@ public class Rule {
             }
         }
     }
-    public NonTerminal LHS;
-    public List<GrammarSymbol> RHS;
-    public int semanticAction;
+    private NonTerminal LHS;
+    private List<GrammarSymbol> RHS;
+    private int semanticAction;
+
+    public void setLHS(NonTerminal LHS){
+        this.LHS = LHS;
+    }
+
+    public NonTerminal getLHS() {
+        return LHS;
+    }
+
+    public void setRHS(List<GrammarSymbol> RHS) {
+        this.RHS = RHS;
+    }
+
+    public List<GrammarSymbol> getRHS() {
+        return RHS;
+    }
+
+    public void setSemanticAction(int semanticAction) {
+        this.semanticAction = semanticAction;
+    }
+
+    public int getSemanticAction() {
+        return semanticAction;
+    }
 }
 
 class GrammarSymbol{
-    public boolean isTerminal;
-    public NonTerminal nonTerminal;
-    public Token terminal;
+    private boolean isTerminal;
+    private NonTerminal nonTerminal;
+    private Token terminal;
+
+
+
     public GrammarSymbol(NonTerminal nonTerminal)
     {
         this.nonTerminal = nonTerminal;
