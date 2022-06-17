@@ -6,8 +6,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Token {
-    public Type type;
-    public String value;
+    private Type type;
+    private String value;
+
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
     public Token(Type type, String value) {
         this.type = type;
