@@ -38,7 +38,9 @@ public class SymbolTable {
     }
 
     public void addField(String fieldName, String className) {
-        klasses.get(className).getFields().put(fieldName, new Symbol(lastType, mem.getDateAddress()));
+        int temp_ = mem.getDateAddress();
+        mem.addDataSizeToLastDataAddress();
+        klasses.get(className).getFields().put(fieldName, new Symbol(lastType, temp_ ));
     }
 
     public void addMethod(String className, String methodName, int address) {
@@ -57,7 +59,9 @@ public class SymbolTable {
             if (klasses.get(className).getMethodes().get(methodName).getLocalVariable().containsKey(localVariableName)) {
                 ErrorHandler.printError("This variable already defined");
             }
-            klasses.get(className).getMethodes().get(methodName).getLocalVariable().put(localVariableName, new Symbol(lastType, mem.getDateAddress()));
+            int temp_ = mem.getDateAddress();
+            mem.addDataSizeToLastDataAddress();
+            klasses.get(className).getMethodes().get(methodName).getLocalVariable().put(localVariableName, new Symbol(lastType, temp_));
 //        }catch (NullPointerException e){
 //            e.printStackTrace();
 //        }
@@ -230,8 +234,12 @@ public class SymbolTable {
             this.codeAddress = codeAddress;
             this.returnType = returnType;
             this.orderdParameters = new ArrayList<>();
-            this.returnAddress = mem.getDateAddress();
-            this.callerAddress = mem.getDateAddress();
+            int temp_ = mem.getDateAddress();
+            mem.addDataSizeToLastDataAddress();
+            this.returnAddress = temp_;
+            temp_ = mem.getDateAddress();
+            mem.addDataSizeToLastDataAddress();
+            this.callerAddress = temp_;
             this.parameters = new HashMap<>();
             this.localVariable = new HashMap<>();
         }
@@ -245,7 +253,9 @@ public class SymbolTable {
         }
 
         public void addParameter(String parameterName) {
-            parameters.put(parameterName, new Symbol(lastType, mem.getDateAddress()));
+            int temp_ = mem.getDateAddress();
+            mem.addDataSizeToLastDataAddress();
+            parameters.put(parameterName, new Symbol(lastType, temp_));
             orderdParameters.add(parameterName);
         }
 
