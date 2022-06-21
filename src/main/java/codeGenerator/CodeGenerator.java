@@ -29,6 +29,7 @@ public class CodeGenerator {
     }
     public void semanticFunction(int func, Token next) {
         Log.print("codegenerator : " + func);
+        Context context = new Context();
         switch (func) {
             case 0:
                 return;
@@ -60,13 +61,16 @@ public class CodeGenerator {
                 assign();
                 break;
             case 10:
-                add();
+                context.setStrategy(new ConcreteStrategyAdd());
+                context.executeStrategy();
                 break;
             case 11:
-                sub();
+                context.setStrategy(new ConcreteStrategySub());
+                context.executeStrategy();
                 break;
             case 12:
-                mult();
+                context.setStrategy(new ConcreteStrategyMult());
+                context.executeStrategy();
                 break;
             case 13:
                 label();
@@ -304,45 +308,54 @@ public class CodeGenerator {
 
     }
 
-    public void add() {
-        int temp_ = memory.getTemp();
-        memory.addTempSizeToLastTempIndex();
-        Address temp = new Address(temp_, varType.Int);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
+    public class ConcreteStrategyAdd implements MathOperationStrategy {
+        @Override
+        public void execute() {
+            int temp_ = memory.getTemp();
+            memory.addTempSizeToLastTempIndex();
+            Address temp = new Address(temp_, varType.Int);
+            Address s2 = ss.pop();
+            Address s1 = ss.pop();
 
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("In add two operands must be integer");
+            if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
+                ErrorHandler.printError("In Add two operands must be integer");
+            }
+            memory.add3AddressCode(Operation.ADD, s1, s2, temp);
+            ss.push(temp);
         }
-        memory.add3AddressCode(Operation.ADD, s1, s2, temp);
-        ss.push(temp);
     }
 
-    public void sub() {
-        int temp_ = memory.getTemp();
-        memory.addTempSizeToLastTempIndex();
-        Address temp = new Address(temp_, varType.Int);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("In sub two operands must be integer");
+    public class ConcreteStrategySub implements MathOperationStrategy {
+        @Override
+        public void execute() {
+            int temp_ = memory.getTemp();
+            memory.addTempSizeToLastTempIndex();
+            Address temp = new Address(temp_, varType.Int);
+            Address s2 = ss.pop();
+            Address s1 = ss.pop();
+            if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
+                ErrorHandler.printError("In Sub two operands must be integer");
+            }
+            memory.add3AddressCode(Operation.SUB, s1, s2, temp);
+            ss.push(temp);
         }
-        memory.add3AddressCode(Operation.SUB, s1, s2, temp);
-        ss.push(temp);
     }
 
-    public void mult() {
-        int temp_ = memory.getTemp();
-        memory.addTempSizeToLastTempIndex();
-        Address temp = new Address(temp_, varType.Int);
-        Address s2 = ss.pop();
-        Address s1 = ss.pop();
-        if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
-            ErrorHandler.printError("In mult two operands must be integer");
-        }
-        memory.add3AddressCode(Operation.MULT, s1, s2, temp);
+    public class ConcreteStrategyMult implements MathOperationStrategy {
+        @Override
+        public void execute() {
+            int temp_ = memory.getTemp();
+            memory.addTempSizeToLastTempIndex();
+            Address temp = new Address(temp_, varType.Int);
+            Address s2 = ss.pop();
+            Address s1 = ss.pop();
+            if (s1.getVarType() != varType.Int || s2.getVarType() != varType.Int) {
+                ErrorHandler.printError("In Mult two operands must be integer");
+            }
+            memory.add3AddressCode(Operation.MULT, s1, s2, temp);
 //        memory.saveMemory();
-        ss.push(temp);
+            ss.push(temp);
+        }
     }
 
     public void label() {
