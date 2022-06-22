@@ -29,7 +29,8 @@ public class CodeGenerator {
     }
     public void semanticFunction(int func, Token next) {
         Log.print("codegenerator : " + func);
-        Context context = new Context();
+        MathContext mathContext = new MathContext();
+        PIDContext pidContext = new PIDContext();
         switch (func) {
             case 0:
                 return;
@@ -37,16 +38,19 @@ public class CodeGenerator {
                 checkID();
                 break;
             case 2:
-                pid(next);
+                pidContext.setStrategy(new ConcreteStrategyPID());
+                pidContext.executeStrategy(next);
                 break;
             case 3:
                 fpid();
                 break;
             case 4:
-                kpid(next);
+                pidContext.setStrategy(new ConcreteStrategyKPID());
+                pidContext.executeStrategy(next);
                 break;
             case 5:
-                intpid(next);
+                pidContext.setStrategy(new ConcreteStrategyIntPID());
+                pidContext.executeStrategy(next);
                 break;
             case 6:
                 startCall();
@@ -61,16 +65,16 @@ public class CodeGenerator {
                 assign();
                 break;
             case 10:
-                context.setStrategy(new ConcreteStrategyAdd());
-                context.executeStrategy();
+                mathContext.setStrategy(new ConcreteStrategyAdd());
+                mathContext.executeStrategy();
                 break;
             case 11:
-                context.setStrategy(new ConcreteStrategySub());
-                context.executeStrategy();
+                mathContext.setStrategy(new ConcreteStrategySub());
+                mathContext.executeStrategy();
                 break;
             case 12:
-                context.setStrategy(new ConcreteStrategyMult());
-                context.executeStrategy();
+                mathContext.setStrategy(new ConcreteStrategyMult());
+                mathContext.executeStrategy();
                 break;
             case 13:
                 label();
@@ -160,34 +164,36 @@ public class CodeGenerator {
         }
     }
 
-    public void pid(Token next) {
-        if (symbolStack.size() > 1) {
-            String methodName = symbolStack.pop();
-            String className = symbolStack.pop();
-            try {
+    public class ConcreteStrategyPID implements PIDStrategy {
+        @Override
+        public void execute(Token next) {
+            if (symbolStack.size() > 1) {
+                String methodName = symbolStack.pop();
+                String className = symbolStack.pop();
+                try {
+                    Symbol s = symbolTable.get(className, methodName, next.getValue());
+                    varType t = varType.Int;
+                    switch (s.getType()) {
+                        case Bool:
+                            t = varType.Bool;
+                            break;
+                        case Int:
+                            t = varType.Int;
+                            break;
+                    }
+                    ss.push(new Address(s.getAddress(), t));
 
-                Symbol s = symbolTable.get(className, methodName, next.getValue());
-                varType t = varType.Int;
-                switch (s.getType()) {
-                    case Bool:
-                        t = varType.Bool;
-                        break;
-                    case Int:
-                        t = varType.Int;
-                        break;
+
+                } catch (Exception e) {
+                    ss.push(new Address(0, varType.Non));
                 }
-                ss.push(new Address(s.getAddress(), t));
-
-
-            } catch (Exception e) {
+                symbolStack.push(className);
+                symbolStack.push(methodName);
+            } else {
                 ss.push(new Address(0, varType.Non));
             }
-            symbolStack.push(className);
-            symbolStack.push(methodName);
-        } else {
-            ss.push(new Address(0, varType.Non));
+            symbolStack.push(next.getValue());
         }
-        symbolStack.push(next.getValue());
     }
 
     public void fpid() {
@@ -208,12 +214,18 @@ public class CodeGenerator {
 
     }
 
-    public void kpid(Token next) {
-        ss.push(symbolTable.get(next.getValue()));
+    public class ConcreteStrategyKPID implements PIDStrategy {
+        @Override
+        public void execute(Token next) {
+            ss.push(symbolTable.get(next.getValue()));
+        }
     }
 
-    public void intpid(Token next) {
-        ss.push(new Address(Integer.parseInt(next.getValue()), varType.Int, TypeAddress.Imidiate));
+    public class ConcreteStrategyIntPID implements PIDStrategy {
+        @Override
+        public void execute(Token next) {
+            ss.push(new Address(Integer.parseInt(next.getValue()), varType.Int, TypeAddress.Imidiate));
+        }
     }
 
     public void startCall() {

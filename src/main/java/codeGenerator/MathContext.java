@@ -1,6 +1,6 @@
 package codeGenerator;
 
-public class Context {
+public class MathContext {
     private MathOperationStrategy strategy;
 
     public void setStrategy(MathOperationStrategy strategy) {
